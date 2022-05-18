@@ -3,7 +3,7 @@ from flask import render_template
 from flask import request
 from flask import redirect
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required
+from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
 from datetime import datetime
 import pytz
 import os
@@ -17,18 +17,20 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-class Post(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(50), nullable=False)
-    body = db.Column(db.String(300), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False,
-                           default=datetime.now(pytz.timezone("Asia/Tokyo")))
-
-
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True)
     password = db.Column(db.String(20))
+    posts = db.relationship('Post', backref="user", lazy=True)
+
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.String(50), nullable=False)
+    body = db.Column(db.String(300), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.now(pytz.timezone("Asia/Tokyo")))
 
 
 @login_manager.user_loader
@@ -58,8 +60,8 @@ def create():
     if request.method == "POST":
         title = request.form.get("title")
         body = request.form.get("body")
-
-        post = Post(title=title, body=body)
+        user_id = current_user.id
+        post = Post(title=title, body=body, user_id=user_id)
 
         db.session.add(post)
         db.session.commit()
