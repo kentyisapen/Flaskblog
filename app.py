@@ -53,6 +53,7 @@ def article2():  # article2関数の定義
 
 
 @app.route("/create", methods=["GET", "POST"])
+@login_required
 def create():
     if request.method == "POST":
         title = request.form.get("title")
