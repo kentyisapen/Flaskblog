@@ -1,0 +1,25 @@
+{% extends "base.html"%}
+<!---->
+{% block content %}
+
+<body>
+    <h1>Hello World!</h1>
+    <p><a href="/create" role="button">新規登録</a></p>
+    <article>
+        <h2>ホーム画面</h2>
+        <p>こちらはホーム画面です。</p>
+        {% for post in posts %}
+        <h2>{{post.title}}</h2>
+        <p>- 作成日時：{{post.created_at}}</p>
+        <p>- {{post.body}}</p>
+        <a href="/{{post.id}}/update" role="button">編集</a>
+        <a href="/{{post.id}}/delete" role="button">削除</a>
+        <!--  -->
+        {% endfor %}
+    </article>
+
+    <a href="{{url_for('article1')}}">記事1へ</a>
+    <a href="{{url_for('article2')}}">記事2へ</a>
+</body>
+
+{% endblock %}

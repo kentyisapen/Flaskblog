@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="jp">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Flaskblog</title>
+</head>
+
+<body>
+    <header>
+        {% if not current_user.is_authenticated %}
+        <a href="{{url_for('login')}}">ログイン</a>
+        <a href="{{url_for('signup')}}">サインアップ</a>
+        <!--  -->
+        {% else %}
+        <a href="{{url_for('logout')}}">ログアウト</a>
+        <!--  -->
+        {% endif %}
+    </header>
+    {% block content %}
+    <!---->
+    {% endblock %}
+    <h4>テンプレート</h4>
+</body>
+
+</html>
