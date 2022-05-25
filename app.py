@@ -17,6 +17,11 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
+@login_manager.unauthorized_handler
+def unauthorized():
+    return render_template('login.html', error="ログインしてください")
+
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True)
