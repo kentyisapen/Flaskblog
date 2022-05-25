@@ -16,7 +16,7 @@ login_manager.init_app(app)
 
 @login_manager.unauthorized_handler
 def unauthorized():
-    return render_template("login.html", error="ログインしてください")
+    return redirect(url_for('login', error="ログインしてください"))
 
 
 tags = db.Table('tags',
@@ -88,8 +88,12 @@ def create():
 
 
 @app.route("/<int:id>/update", methods=["GET", "POST"])
+@login_required
 def update(id):
     post = Post.query.get(id)
+    if current_user.id != post.user_id:
+        return redirect(url_for('index', error="アクセス権がありません"))
+
     if request.method == "GET":
         return render_template("update.html", post=post)
     else:
@@ -100,8 +104,12 @@ def update(id):
 
 
 @app.route("/<int:id>/delete", methods=["GET"])
+@login_required
 def delete(id):
     post = Post.query.get(id)
+    if current_user.id != post.user_id:
+        return redirect(url_for('index', error="アクセス権がありません"))
+
     db.session.delete(post)
     db.session.commit()
     return redirect("/")
