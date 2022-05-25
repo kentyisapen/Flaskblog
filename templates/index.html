@@ -10,6 +10,11 @@
         <p>こちらはホーム画面です。</p>
         {% for post in posts %}
         <h2>{{post.title}}</h2>
+        <ul>
+            {% for tag in post.tags %}
+            <li>{{tag.name}}</li>
+            {% endfor %}
+        </ul>
         <p>- 作成者：{{post.user.username}}</p>
         <p>- 作成日時：{{post.created_at}}</p>
         <p>- {{post.body}}</p>

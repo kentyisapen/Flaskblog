@@ -1,7 +1,4 @@
-from flask import Flask
-from flask import render_template
-from flask import request
-from flask import redirect
+from flask import Flask, render_template, redirect, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
 from datetime import datetime
@@ -19,7 +16,15 @@ login_manager.init_app(app)
 
 @login_manager.unauthorized_handler
 def unauthorized():
-    return render_template('login.html', error="ログインしてください")
+    return render_template("login.html", error="ログインしてください")
+
+
+tags = db.Table('tags',
+                db.Column('tag_id', db.Integer, db.ForeignKey(
+                    'tag.id'), primary_key=True),
+                db.Column('post_id', db.Integer, db.ForeignKey(
+                    'post.id'), primary_key=True)
+                )
 
 
 class User(UserMixin, db.Model):
@@ -32,10 +37,17 @@ class User(UserMixin, db.Model):
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    tags = db.relationship('Tag', secondary="tags",
+                           lazy='subquery', backref=db.backref('posts', lazy=True))
     title = db.Column(db.String(50), nullable=False)
     body = db.Column(db.String(300), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False,
                            default=datetime.now(pytz.timezone("Asia/Tokyo")))
+
+
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20), unique=True)
 
 
 @login_manager.user_loader
